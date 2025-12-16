@@ -1,0 +1,42 @@
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    font-size: 1.2rem;
+}
+
+.left {
+
+}
+.right {
+    display: flex;
+    gap: 16px;
+    color: #bebebe;
+
+}
+  
+.logo {
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--foreground);
+}
+
+.link {
+    text-decoration: none;
+    color: var(--foreground);
+    opacity: 0.8;
+}
+
+.link:hover {
+    color: red;
+}
+
+.active {
+    color: red;
+    font-weight: 600;
+}
