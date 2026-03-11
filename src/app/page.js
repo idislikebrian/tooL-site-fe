@@ -1,9 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import styles from "./page.module.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import MintCard from "@/components/MintCard";
+import { getContractUrl } from "@/lib/toolContract";
 
 export default function Home() {
   return (
@@ -14,7 +15,7 @@ export default function Home() {
         <ul className={styles.ctas}>
           <li>
             <Link
-              href="https://opensea.io"
+              href="https://opensea.io/collection/tools-for-builders"
               target="_blank"
               className={styles.primary}
             >
@@ -25,7 +26,7 @@ export default function Home() {
           <li>Farcaster</li>
           <li>
             <Link
-              href="https://basescan.org/address/0x5000000000000000000000000000000000000000"
+              href={getContractUrl()}
               target="_blank"
               className={styles.primary}
             >
@@ -40,7 +41,7 @@ export default function Home() {
           <br />
           Just tools, waiting to be used.
         </p>
-
+        <MintCard />
       </main>
       <Footer />
     </div>

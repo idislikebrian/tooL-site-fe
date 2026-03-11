@@ -13,9 +13,8 @@ export default function FAQPage() {
         <section className={styles.faq}>
           <h2>What is tooL?</h2>
           <p>
-            tooL is a collection of 7,777 unique onchain toolkits. Each token
-            represents a deterministic set of tools generated entirely from
-            code.
+            tooL is a collection of 888 onchain toolkits. Each token represents
+            a deterministic set of tools generated entirely from code.
           </p>
           <p>
             The project is forked from the original Loot contract, extending its
@@ -31,12 +30,31 @@ export default function FAQPage() {
         <section className={styles.faq}>
           <h2>How does minting work?</h2>
           <p>
-            At launch, minting is free for a limited window (gas only). After
-            that, minting costs a small fixed ETH amount.
+            tooL has a max supply of 888. Of those, 777 are public and 111 are
+            reserved for admin minting.
           </p>
           <p>
-            Minters choose their token ID. The tool set is derived
-            deterministically from that ID.
+            On mainnet, public minting is free for the first 69 days after
+            deployment, plus gas. After that, each public mint costs 0.00111
+            ETH.
+          </p>
+          <p>
+            There are two public mint paths. You can claim a specific public
+            token ID from 1 to 777, or mint the next available public token.
+            The toolset and title are derived deterministically from the token
+            ID.
+          </p>
+        </section>
+
+        <section className={styles.faq}>
+          <h2>What is stored onchain?</h2>
+          <p>
+            The metadata and SVG image are generated onchain by the contract and
+            renderer. There are no offchain image files or metadata servers.
+          </p>
+          <p>
+            Titles, context, attributes, and bonus markers all resolve from the
+            token ID and contract logic.
           </p>
         </section>
 

@@ -1,0 +1,206 @@
+.card {
+  width: 100%;
+  max-width: 1000px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 12px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+}
+
+.copy h2 {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.description {
+  max-width: 38ch;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-content: start;
+}
+
+.stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.stats a {
+  text-decoration: underline;
+}
+
+.label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(17, 17, 17, 0.68);
+}
+
+
+.actions {
+  grid-column: 1 / span 2;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.mintButton,
+.modeButton,
+.modeActive {
+  border: 1px solid var(--foreground);
+  background: var(--yellow);
+  color: var(--foreground);
+  min-height: 50px;
+  padding: 0 16px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.mintButton {
+  width: fit-content;
+  background: var(--foreground);
+  color: #fffef6;
+}
+
+.modeRow {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 160px 160px minmax(220px, 1fr);
+  align-items: stretch;
+  gap: 10px;
+}
+
+.modeActive {
+  background: var(--red);
+  color: #fffef6;
+}
+
+.connectShell {
+  width: fit-content;
+}
+
+.connectShell :global(button) {
+  min-height: 50px;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.walletNote,
+.note {
+  font-size: 0.9rem;
+}
+
+.walletNote {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feedbackCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid rgba(14, 107, 63, 0.24);
+  background: rgba(14, 107, 63, 0.08);
+}
+
+.txLink {
+  width: fit-content;
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
+
+.claimField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-height: 76px;
+  justify-content: end;
+}
+
+.claimFieldHidden {
+  visibility: hidden;
+}
+
+.claimField span {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.claimField input {
+  min-height: 50px;
+  padding: 0 12px;
+  border: 1px solid var(--foreground);
+  background: white;
+  font: inherit;
+}
+
+.modeButton,
+.modeActive {
+  align-self: end;
+}
+
+.status,
+.error {
+  font-size: 0.95rem;
+}
+
+.status {
+  color: #0e6b3f;
+}
+
+.error {
+  color: #b01919;
+}
+
+@media (max-width: 760px) {
+  .card {
+    grid-template-columns: 1fr;
+    padding: 20px;
+    box-shadow: 8px 8px 0 var(--foreground);
+  }
+
+  .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .connectShell,
+  .connectShell :global(button),
+  .mintButton,
+  .claimField,
+  .modeRow {
+    width: 100%;
+  }
+
+  .modeRow {
+    grid-template-columns: 1fr;
+  }
+}

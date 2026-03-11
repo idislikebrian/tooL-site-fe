@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# tooL.sol
 
-## Getting Started
+tooL is a collection of 888 onchain toolkits.
 
-First, run the development server:
+Forked from the original Loot contract, tooL extends the idea of randomized, fully onchain primitives from fantasy gear to tools for building—physical, digital, creative, and conceptual.
+
+No stats.  
+No instructions.  
+No prescribed use.
+
+Just tools.
+
+---
+
+## Tech
+
+- Next.js (App Router)
+- CSS Modules
+- Fully onchain SVG + metadata (contract-side)
+- Minimal frontend for viewing and context
+
+---
+
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+To enable minting from the site, set the deployed contract address before starting Next.js:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+NEXT_PUBLIC_TOOL_CONTRACT_ADDRESS=0xYourDeployedContractAddress
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id
+NEXT_PUBLIC_MAINNET_RPC_URL=https://your-mainnet-rpc.example
+```
 
-## Learn More
+`NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` is required for Rainbow and WalletConnect. MetaMask/injected wallets also flow through RainbowKit after this change.
+`NEXT_PUBLIC_MAINNET_RPC_URL` is optional, but recommended if you want the sale stats to read from your preferred Ethereum RPC instead of public fallback endpoints.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* `src/app` — routes (Home, FAQ, Resources)
+* `src/components` — shared UI
+* `src/styles` — global styles
+* Contract logic lives separately from this repo
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Philosophy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+tooL intentionally avoids guidance, rarity frameworks, or gameplay mechanics at the base layer.
+
+Meaning, value, and utility are expected to emerge downstream—through use, remixing, and interpretation.
+
+---
+
+## Funding
+
+Created by Brian Felix in support of the $VROOM ecosystem.
+
+---
+
+## License / Usage
+
+Use freely. Build freely. Interpret freely.
