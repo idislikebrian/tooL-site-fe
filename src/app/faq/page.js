@@ -28,19 +28,19 @@ export default function FAQPage() {
         </section>
 
         <section className={styles.faq}>
-          <h2>How does minting work?</h2>
+          <h2>How does collecting work?</h2>
           <p>
             tooL has a max supply of 888. Of those, 777 are public and 111 are
-            reserved for admin minting.
+            reserved for admin collection.
           </p>
           <p>
-            On mainnet, public minting is free for the first 69 days after
-            deployment, plus gas. After that, each public mint costs 0.00111
+            On mainnet, public collection is free for the first 69 days after
+            deployment, plus gas. After that, each public collection costs 0.00111
             ETH.
           </p>
           <p>
-            There are two public mint paths. You can claim a specific public
-            token ID from 1 to 777, or mint the next available public token.
+            There are two public collection paths. You can claim a specific public
+            token ID from 1 to 777, or collect the next available public token.
             The toolset and title are derived deterministically from the token
             ID.
           </p>

@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build --webpack",
-    "start": "next start",
-    "lint": "eslint"
+    "dev": "NODE_OPTIONS='--require ./scripts/suppress-baseline-warning.cjs' BROWSERSLIST_IGNORE_OLD_DATA=true BASELINE_BROWSER_MAPPING_IGNORE_OLD_DATA=true next dev --webpack",
+    "build": "NODE_OPTIONS='--require ./scripts/suppress-baseline-warning.cjs' BROWSERSLIST_IGNORE_OLD_DATA=true BASELINE_BROWSER_MAPPING_IGNORE_OLD_DATA=true next build --webpack",
+    "start": "NODE_OPTIONS='--require ./scripts/suppress-baseline-warning.cjs' BROWSERSLIST_IGNORE_OLD_DATA=true BASELINE_BROWSER_MAPPING_IGNORE_OLD_DATA=true next start",
+    "lint": "NODE_OPTIONS='--require ./scripts/suppress-baseline-warning.cjs' BROWSERSLIST_IGNORE_OLD_DATA=true BASELINE_BROWSER_MAPPING_IGNORE_OLD_DATA=true eslint"
   },
   "dependencies": {
     "@rainbow-me/rainbowkit": "^2.2.10",

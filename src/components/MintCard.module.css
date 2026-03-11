@@ -68,6 +68,16 @@
   gap: 14px;
 }
 
+.walletButton {
+  border: 1px solid var(--foreground);
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 50px;
+  padding: 0 16px;
+  font: inherit;
+  cursor: pointer;
+}
+
 .mintButton,
 .modeButton,
 .modeActive {
@@ -128,12 +138,165 @@
   padding: 12px;
   border: 1px solid rgba(14, 107, 63, 0.24);
   background: rgba(14, 107, 63, 0.08);
+  width: 100%;
+}
+
+.loaderRail {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.loaderSegment {
+  height: 12px;
+  border: 1px solid var(--foreground);
+  background: linear-gradient(
+    90deg,
+    rgba(214, 34, 34, 0.14),
+    rgba(214, 34, 34, 0.84),
+    rgba(236, 235, 94, 0.32)
+  );
+  background-size: 240% 100%;
+  animation: scan 1.2s linear infinite;
+}
+
+.loaderSegment:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.loaderSegment:nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+.loaderSegment:nth-child(4) {
+  animation-delay: 0.36s;
+}
+
+.loaderCopy {
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 .txLink {
   width: fit-content;
   font-size: 0.9rem;
   text-decoration: underline;
+}
+
+.assemblySlip {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--foreground);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 247, 221, 0.96)),
+    var(--background);
+  overflow: hidden;
+}
+
+.revealing {
+  animation: slipReveal 0.7s ease forwards;
+}
+
+.slipStamp {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(214, 34, 34, 0),
+    rgba(214, 34, 34, 0.14),
+    rgba(214, 34, 34, 0)
+  );
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+
+.revealing .slipStamp {
+  animation: stampPass 0.7s ease forwards;
+}
+
+.slipKicker,
+.slipLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(17, 17, 17, 0.65);
+}
+
+.slipTitle {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 0.94;
+  text-transform: uppercase;
+}
+
+.slipBody,
+.joiningCopy {
+  font-size: 0.96rem;
+  line-height: 1.6;
+}
+
+.slipGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.slipGrid div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.slipValue,
+.progressValue {
+  font-size: 1rem;
+}
+
+.progressBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.progressMeta,
+.joiningRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.progressRail {
+  position: relative;
+  width: 100%;
+  height: 14px;
+  border: 1px solid var(--foreground);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(17, 17, 17, 0.04) 0,
+      rgba(17, 17, 17, 0.04) 22px,
+      transparent 22px,
+      transparent 24px
+    ),
+    rgba(255, 255, 255, 0.8);
+}
+
+.progressMarker {
+  position: absolute;
+  top: -5px;
+  width: 12px;
+  height: 22px;
+  background: var(--red);
+  border: 1px solid var(--foreground);
+  transform: translateX(-50%);
 }
 
 .claimField {
@@ -168,6 +331,64 @@
   align-self: end;
 }
 
+.randomRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.randomButton {
+  position: relative;
+  border: 1px solid var(--foreground);
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.randomButton::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 8px;
+  border: 1px solid var(--foreground);
+  background: var(--yellow);
+  color: var(--foreground);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s ease;
+}
+
+.randomButton:hover::after,
+.randomButton:focus-visible::after {
+  opacity: 1;
+}
+
+.randomIcon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.randomMeta {
+  font-size: 0.9rem;
+  color: rgba(17, 17, 17, 0.72);
+}
+
 .status,
 .error {
   font-size: 0.95rem;
@@ -179,6 +400,50 @@
 
 .error {
   color: #b01919;
+}
+
+.connectShell :global([data-rk] button) {
+  font-weight: 600;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+}
+
+@keyframes scan {
+  0% {
+    background-position: 160% 0;
+  }
+
+  100% {
+    background-position: -40% 0;
+  }
+}
+
+@keyframes stampPass {
+  0% {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+
+  75% {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes slipReveal {
+  0% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @media (max-width: 760px) {
@@ -196,11 +461,27 @@
   .connectShell :global(button),
   .mintButton,
   .claimField,
-  .modeRow {
+  .modeRow,
+  .randomButton {
     width: 100%;
   }
 
   .modeRow {
     grid-template-columns: 1fr;
+  }
+
+  .randomButton::after {
+    left: 0;
+    top: calc(100% + 10px);
+    transform: none;
+  }
+
+  .slipGrid,
+  .progressMeta,
+  .joiningRow,
+  .randomRow {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

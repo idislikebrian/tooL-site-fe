@@ -30,7 +30,7 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000)
 
-To enable minting from the site, set the deployed contract address before starting Next.js:
+To enable collecting from the site, set the deployed contract address before starting Next.js:
 
 ```bash
 NEXT_PUBLIC_TOOL_CONTRACT_ADDRESS=0xYourDeployedContractAddress
