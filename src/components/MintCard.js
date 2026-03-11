@@ -13,7 +13,6 @@ import {
 import {
   useAccount,
   useSwitchChain,
-  useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
 
@@ -150,16 +149,9 @@ export default function MintCard() {
     isPending: isWriting,
     error: writeError,
   } = useWriteContract();
-  const {
-    data: receipt,
-    isLoading: isConfirming,
-    isSuccess: isConfirmed,
-    error: receiptError,
-  } = useWaitForTransactionReceipt({
-    hash: pendingHash,
-    chainId: TOOL_CHAIN.id,
-    confirmations: 1,
-  });
+  const [receipt, setReceipt] = useState(null);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [receiptError, setReceiptError] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -227,8 +219,59 @@ export default function MintCard() {
   }
 
   useEffect(() => {
+    if (!pendingHash || collectionSession.phase !== "preparing") {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function watchReceipt() {
+      setIsConfirming(true);
+      setReceiptError(null);
+
+      try {
+        const confirmedReceipt = await publicClient.waitForTransactionReceipt({
+          hash: pendingHash,
+          confirmations: 1,
+          pollingInterval: 1_500,
+          retryCount: 120,
+        });
+
+        if (cancelled) {
+          return;
+        }
+
+        setReceipt(confirmedReceipt);
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        setReceiptError(error);
+        setCollectionSession((current) =>
+          current.phase === "preparing"
+            ? {
+                ...current,
+                phase: "idle",
+              }
+            : current,
+        );
+      } finally {
+        if (!cancelled) {
+          setIsConfirming(false);
+        }
+      }
+    }
+
+    watchReceipt();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [collectionSession.phase, pendingHash]);
+
+  useEffect(() => {
     if (
-      !isConfirmed ||
       !receipt ||
       collectionSession.phase !== "preparing" ||
       !collectionSession.txHash
@@ -310,7 +353,7 @@ export default function MintCard() {
     return () => {
       cancelled = true;
     };
-  }, [address, collectionSession, isConfirmed, receipt]);
+  }, [address, collectionSession, receipt]);
 
   async function submitMint() {
     if (!TOOL_CONTRACT_ADDRESS) {
@@ -328,6 +371,8 @@ export default function MintCard() {
     setLocalError("");
     setConfirmedHash(undefined);
     setPendingHash(undefined);
+    setReceipt(null);
+    setReceiptError(null);
     setCollectionSession({
       mode: mintMode,
       intendedTokenId:
