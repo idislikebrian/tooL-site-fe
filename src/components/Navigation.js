@@ -19,6 +19,15 @@ export default function Navigation() {
 
       <div className={styles.right}>
         <Link
+          href="/gallery"
+          className={`${styles.link} ${
+            isActive("/gallery") ? styles.active : ""
+          }`}
+        >
+          Gallery
+        </Link>
+
+        <Link
           href="/faq"
           className={`${styles.link} ${isActive("/faq") ? styles.active : ""}`}
         >

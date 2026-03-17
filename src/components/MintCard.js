@@ -111,6 +111,52 @@ function formatTimestamp(timestamp) {
   }).format(Number(timestamp) * 1000);
 }
 
+function decodeBase64(value) {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  return window.atob(value);
+}
+
+function parseDataUriJson(dataUri) {
+  const base64Prefix = "data:application/json;base64,";
+  const utf8Prefix = "data:application/json;utf8,";
+
+  if (!dataUri) {
+    return null;
+  }
+
+  try {
+    if (dataUri.startsWith(base64Prefix)) {
+      return JSON.parse(decodeBase64(dataUri.slice(base64Prefix.length)));
+    }
+
+    if (dataUri.startsWith(utf8Prefix)) {
+      return JSON.parse(decodeURIComponent(dataUri.slice(utf8Prefix.length)));
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+async function readTokenMetadata(tokenId) {
+  if (!TOOL_CONTRACT_ADDRESS || !tokenId) {
+    return null;
+  }
+
+  const tokenUri = await publicClient.readContract({
+    address: TOOL_CONTRACT_ADDRESS,
+    abi: TOOL_ABI,
+    functionName: "tokenURI",
+    args: [BigInt(tokenId)],
+  });
+
+  return parseDataUriJson(tokenUri);
+}
+
 export default function MintCard() {
   const [mintMode, setMintMode] = useState("next");
   const [tokenId, setTokenId] = useState("1");
@@ -152,6 +198,9 @@ export default function MintCard() {
   const [receipt, setReceipt] = useState(null);
   const [isConfirming, setIsConfirming] = useState(false);
   const [receiptError, setReceiptError] = useState(null);
+  const [mintedTokenMetadata, setMintedTokenMetadata] = useState(null);
+  const [mintedTokenMetadataStatus, setMintedTokenMetadataStatus] =
+    useState("idle");
 
   useEffect(() => {
     let cancelled = false;
@@ -206,6 +255,7 @@ export default function MintCard() {
   const freeMintActive = freeMintEndsAt
     ? BigInt(Math.floor(Date.now() / 1000)) <= freeMintEndsAt
     : null;
+  const displayedCollectedTokenId = collectionSession.collectedTokenId;
   let effectiveError = "";
 
   if (localError) {
@@ -355,6 +405,42 @@ export default function MintCard() {
     };
   }, [address, collectionSession, receipt]);
 
+  useEffect(() => {
+    if (!displayedCollectedTokenId) {
+      setMintedTokenMetadata(null);
+      setMintedTokenMetadataStatus("idle");
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadTokenMetadata() {
+      setMintedTokenMetadataStatus("loading");
+
+      try {
+        const metadata = await readTokenMetadata(displayedCollectedTokenId);
+
+        if (!cancelled) {
+          setMintedTokenMetadata(metadata);
+          setMintedTokenMetadataStatus(metadata?.image ? "ready" : "empty");
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setMintedTokenMetadata(null);
+          setMintedTokenMetadataStatus(
+            error?.shortMessage || error?.message ? "error" : "empty",
+          );
+        }
+      }
+    }
+
+    loadTokenMetadata();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [displayedCollectedTokenId]);
+
   async function submitMint() {
     if (!TOOL_CONTRACT_ADDRESS) {
       setLocalError(
@@ -434,6 +520,9 @@ export default function MintCard() {
   const mintButtonLabel =
     mintMode === "claim" ? `Claim #${tokenId || "?"}` : "Collect Next";
   const isMinting = isWriting || isConfirming || isSwitchingChain;
+  const showSuccessModal =
+    collectionSession.phase === "revealing" ||
+    collectionSession.phase === "joining";
   const etherscanTxUrl = pendingHash
     ? `https://etherscan.io/tx/${pendingHash}`
     : confirmedHash
@@ -445,12 +534,16 @@ export default function MintCard() {
       : 0;
   const revealHeading =
     collectionSession.mode === "claim"
-      ? `Slot #${collectionSession.collectedTokenId} claimed`
-      : `tooL #${collectionSession.collectedTokenId} assigned`;
+      ? `toolbox ${String(collectionSession.collectedTokenId).padStart(3, "0")} assembled.`
+      : `toolbox ${String(collectionSession.collectedTokenId).padStart(3, "0")} assembled.`;
   const revealCopy =
     collectionSession.mode === "claim"
-      ? "Requested slot acknowledged. Box indexed into your custody."
-      : "Next sequence resolved. Box assigned and indexed to your wallet.";
+      ? "you asked for this one by number. the system doesn't care why. but it noticed."
+      : "you took what was next. that's how most of this works.";
+  const preparingCopy =
+    collectionSession.mode === "claim" && collectionSession.intendedTokenId
+      ? `locating slot ${String(collectionSession.intendedTokenId).padStart(3, "0")}...`
+      : "assigning next available slot...";
   const mintedPublicIdSet = new Set(mintedPublicIds);
   const availablePublicIds = [];
   for (let id = 1; id <= PUBLIC_TOKEN_LIMIT; id += 1) {
@@ -533,8 +626,8 @@ export default function MintCard() {
         <p className={styles.eyebrow}>On Ethereum Mainnet</p>
         <h2>Collect a tooL box</h2>
         <p className={styles.description}>
-          Connect with MetaMask, Rainbow, or WalletConnect, then collect the
-          next tooL or claim a specific public token ID.
+          Connect wallet, then collect the
+          next available tooL or claim a specific ID.
         </p>
       </div>
       <div className={styles.actions}>
@@ -674,7 +767,7 @@ export default function MintCard() {
 
         {collectionSession.phase === "preparing" ? (
           <div className={styles.feedbackCard}>
-            <p className={styles.status}>Preparing collection sequence...</p>
+            <p className={styles.status}>{preparingCopy}</p>
             <div className={styles.loaderRail} aria-hidden="true">
               <span className={styles.loaderSegment} />
               <span className={styles.loaderSegment} />
@@ -688,8 +781,7 @@ export default function MintCard() {
             </p>
           </div>
         ) : null}
-        {collectionSession.phase === "revealing" ||
-        collectionSession.phase === "joining" ? (
+        {showSuccessModal ? (
           <div
             className={`${styles.assemblySlip} ${
               collectionSession.phase === "revealing" ? styles.revealing : ""
@@ -700,6 +792,29 @@ export default function MintCard() {
             <p className={styles.slipKicker}>ASSEMBLY SLIP</p>
             <h3 className={styles.slipTitle}>{revealHeading}</h3>
             <p className={styles.slipBody}>{revealCopy}</p>
+            {mintedTokenMetadataStatus === "loading" ? (
+              <div className={styles.tokenPreviewStatus}>
+                Loading onchain artwork for #{displayedCollectedTokenId}...
+              </div>
+            ) : null}
+            {mintedTokenMetadataStatus === "error" ? (
+              <div className={styles.tokenPreviewStatus}>
+                Unable to load onchain artwork for #{displayedCollectedTokenId}.
+              </div>
+            ) : null}
+            {mintedTokenMetadata?.image ? (
+              <div className={styles.tokenPreview}>
+                <img
+                  src={mintedTokenMetadata.image}
+                  alt={
+                    mintedTokenMetadata.name ||
+                    `tooLbox #${displayedCollectedTokenId}`
+                  }
+                  className={styles.tokenPreviewImage}
+                />
+                
+              </div>
+            ) : null}
             <div className={styles.slipGrid}>
               <div>
                 <span className={styles.slipLabel}>Collector</span>
@@ -728,7 +843,7 @@ export default function MintCard() {
               <div className={styles.progressMeta}>
                 <span className={styles.slipLabel}>Public range placement</span>
                 <span className={styles.progressValue}>
-                  #{collectionSession.collectedTokenId} of {publicSupply || "777"}
+                  {String(collectionSession.collectedTokenId).padStart(3, "0")} / {publicSupply || "777"}
                 </span>
               </div>
               <div className={styles.progressRail} aria-hidden="true">

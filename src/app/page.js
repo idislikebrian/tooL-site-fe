@@ -4,6 +4,7 @@ import styles from "./page.module.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import MintCard from "@/components/MintCard";
+import OwnedToolboxes from "@/components/OwnedToolboxes";
 import { getContractUrl } from "@/lib/toolContract";
 
 export default function Home() {
@@ -42,6 +43,7 @@ export default function Home() {
           Just tools, waiting to be used.
         </p>
         <MintCard />
+        <OwnedToolboxes />
       </main>
       <Footer />
     </div>

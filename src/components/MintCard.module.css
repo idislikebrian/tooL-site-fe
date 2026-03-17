@@ -185,17 +185,21 @@
 }
 
 .assemblySlip {
-  position: relative;
-  width: 100%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 40;
+  width: min(720px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 18px;
+  padding: 22px;
   border: 1px solid var(--foreground);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 247, 221, 0.96)),
-    var(--background);
+  background: var(--yellow);
   overflow: hidden;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
 }
 
 .revealing {
@@ -237,6 +241,39 @@
 .joiningCopy {
   font-size: 0.96rem;
   line-height: 1.6;
+}
+
+.tokenPreview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.tokenPreviewStatus {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  background: rgba(255, 255, 255, 0.62);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.tokenPreviewImage {
+  display: block;
+  width: min(100%, 320px);
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: #fff9d6;
+}
+
+.tokenPreviewName {
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .slipGrid {
@@ -436,12 +473,12 @@
 
 @keyframes slipReveal {
   0% {
-    transform: translateY(10px);
+    transform: translate(-50%, calc(-50% + 10px));
     opacity: 0;
   }
 
   100% {
-    transform: translateY(0);
+    transform: translate(-50%, -50%);
     opacity: 1;
   }
 }
@@ -450,7 +487,7 @@
   .card {
     grid-template-columns: 1fr;
     padding: 20px;
-    box-shadow: 8px 8px 0 var(--foreground);
+    box-shadow: none;
   }
 
   .stats {
@@ -466,14 +503,33 @@
     width: 100%;
   }
 
+  .actions {
+    align-items: stretch;
+  }
+
   .modeRow {
     grid-template-columns: 1fr;
+  }
+
+  .claimFieldHidden {
+    display: none;
+  }
+
+  .walletNote {
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   .randomButton::after {
     left: 0;
     top: calc(100% + 10px);
     transform: none;
+  }
+
+  .assemblySlip {
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+    padding: 18px;
   }
 
   .slipGrid,
@@ -483,5 +539,44 @@
     grid-template-columns: 1fr;
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+  .card {
+    gap: 18px;
+    padding: 16px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .copy h2 {
+    font-size: clamp(1.7rem, 10vw, 2.3rem);
+  }
+
+  .description,
+  .loaderCopy,
+  .slipBody,
+  .joiningCopy {
+    font-size: 0.92rem;
+  }
+
+  .assemblySlip {
+    width: calc(100vw - 12px);
+    max-height: calc(100vh - 12px);
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .slipTitle {
+    font-size: clamp(1.4rem, 8vw, 2rem);
+  }
+
+  .tokenPreview,
+  .tokenPreviewStatus,
+  .slipGrid div {
+    padding: 10px;
   }
 }
