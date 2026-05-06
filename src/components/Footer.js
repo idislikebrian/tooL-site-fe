@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer className={styles.footer}>
       Created by Brian Felix (
-      <a href="farcaster.xyz/chamaquito.eth" target="_blank" rel="noopener noreferrer">
+      <a href="https://farcaster.xyz/chamaquito.eth" target="_blank" rel="noopener noreferrer">
         @chamaquito.eth
       </a>
       ) to support the{" "}

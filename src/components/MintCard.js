@@ -158,7 +158,6 @@ async function readTokenMetadata(tokenId) {
 }
 
 export default function MintCard() {
-  const [mintMode, setMintMode] = useState("next");
   const [tokenId, setTokenId] = useState("1");
   const [localError, setLocalError] = useState("");
   const [pendingHash, setPendingHash] = useState();
@@ -441,7 +440,7 @@ export default function MintCard() {
     };
   }, [displayedCollectedTokenId]);
 
-  async function submitMint() {
+  async function submitMint(requestedMode) {
     if (!TOOL_CONTRACT_ADDRESS) {
       setLocalError(
         "Set NEXT_PUBLIC_TOOL_CONTRACT_ADDRESS to enable collecting.",
@@ -454,15 +453,29 @@ export default function MintCard() {
       return;
     }
 
+    if (requestedMode === "claim") {
+      const normalizedTokenId = Number.parseInt(tokenId, 10);
+
+      if (!Number.isInteger(normalizedTokenId) || normalizedTokenId < 1) {
+        setLocalError("Enter a valid public token ID.");
+        return;
+      }
+
+      if (publicSupply && normalizedTokenId > Number(publicSupply)) {
+        setLocalError(`Enter a public token ID from 1 to ${publicSupply}.`);
+        return;
+      }
+    }
+
     setLocalError("");
     setConfirmedHash(undefined);
     setPendingHash(undefined);
     setReceipt(null);
     setReceiptError(null);
     setCollectionSession({
-      mode: mintMode,
+      mode: requestedMode,
       intendedTokenId:
-        mintMode === "claim"
+        requestedMode === "claim"
           ? Number.parseInt(tokenId, 10)
           : nextTokenId
             ? Number(nextTokenId)
@@ -479,19 +492,11 @@ export default function MintCard() {
         await switchChainAsync({ chainId: TOOL_CHAIN.id });
       }
 
-      if (mintMode === "claim") {
-        const normalizedTokenId = Number.parseInt(tokenId, 10);
-
-        if (!Number.isInteger(normalizedTokenId) || normalizedTokenId < 1) {
-          throw new Error("Enter a valid public token ID.");
-        }
-      }
-
       const hash = await writeContractAsync({
         address: TOOL_CONTRACT_ADDRESS,
         abi: TOOL_ABI,
-        functionName: mintMode === "claim" ? "claim" : "mintNext",
-        args: mintMode === "claim" ? [BigInt(tokenId)] : [],
+        functionName: requestedMode === "claim" ? "claim" : "mintNext",
+        args: requestedMode === "claim" ? [BigInt(tokenId)] : [],
         value: freeMintActive ? 0n : (mintPrice ?? 0n),
         chain: TOOL_CHAIN,
       });
@@ -517,8 +522,6 @@ export default function MintCard() {
     }
   }
 
-  const mintButtonLabel =
-    mintMode === "claim" ? `Claim #${tokenId || "?"}` : "Collect Next";
   const isMinting = isWriting || isConfirming || isSwitchingChain;
   const showSuccessModal =
     collectionSession.phase === "revealing" ||
@@ -570,9 +573,29 @@ export default function MintCard() {
     }
 
     const randomIndex = Math.floor(Math.random() * availablePublicIds.length);
-    setMintMode("claim");
     setTokenId(String(availablePublicIds[randomIndex]));
   }
+
+  const activeMintMode =
+    collectionSession.phase === "preparing" ? collectionSession.mode : null;
+  const collectButtonLabel =
+    isSwitchingChain && activeMintMode === "next"
+      ? "Switching network..."
+      : activeMintMode === "next" &&
+          (collectionSession.phase === "preparing" || isConfirming)
+        ? "Confirming..."
+        : isWriting && activeMintMode === "next"
+          ? "Submitting..."
+          : "Collect next available";
+  const claimButtonLabel =
+    isSwitchingChain && activeMintMode === "claim"
+      ? "Switching network..."
+      : activeMintMode === "claim" &&
+          (collectionSession.phase === "preparing" || isConfirming)
+        ? "Confirming..."
+        : isWriting && activeMintMode === "claim"
+          ? "Submitting..."
+          : `Claim toolbox #${tokenId || "?"}`;
 
   return (
     <section className={styles.card}>
@@ -675,95 +698,60 @@ export default function MintCard() {
           </p>
         ) : null}
 
-        <div className={styles.modeRow}>
-          <button
-            type="button"
-            className={
-              mintMode === "next" ? styles.modeActive : styles.modeButton
-            }
-            onClick={() => setMintMode("next")}
-          >
-            Collect next
-          </button>
-          <button
-            type="button"
-            className={
-              mintMode === "claim" ? styles.modeActive : styles.modeButton
-            }
-            onClick={() => setMintMode("claim")}
-          >
-            Claim ID
-          </button>
-          <label
-            className={`${styles.claimField} ${
-              mintMode === "claim" ? "" : styles.claimFieldHidden
-            }`}
-          >
-            <span>Public token ID</span>
-            <input
-              type="number"
-              min="1"
-              max={publicSupply ? publicSupply.toString() : "777"}
-              value={tokenId}
-              onChange={(event) => setTokenId(event.target.value)}
-              disabled={mintMode !== "claim"}
-              aria-hidden={mintMode !== "claim"}
-            />
-          </label>
-        </div>
-
-        <div className={styles.randomRow}>
-          <button
-            type="button"
-            className={styles.randomButton}
-            onClick={chooseRandomOpenId}
-            disabled={isAvailabilityLoading || !availablePublicIds.length}
-            aria-label="Random tooLbox"
-            data-tooltip="Random tooLbox"
-          >
-            {isAvailabilityLoading ? (
-              "..."
-            ) : (
-              <svg
-                className={styles.randomIcon}
-                viewBox="0 0 14 14"
-                role="img"
-                focusable="false"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill="gray"
-                  d="M5.459789 4.64957q-.40178.61607-.91741 1.82813-.14732-.30134-.24777-.4855-.10044-.18415-.2712-.42522-.17076-.24107-.34152-.37835-.17076-.13727-.42188-.23437-.25111-.0971-.54575-.0971H1.214255q-.09375 0-.154018-.0603-.060268-.0602-.060268-.15399V3.35716q0-.0937.06027-.15402.06027-.0603.154018-.0603h1.500004q1.6741 0 2.74553 1.5067zm7.54018 5.35045q0 .0937-.0603.15402l-2.14285 2.14285q-.0603.0603-.15402.0603-.0871 0-.15067-.0636-.0636-.0636-.0636-.15067v-1.28571q-.21428 0-.5692.003-.35491.003-.54241.007-.1875.003-.48884-.007-.30133-.0101-.47544-.0335-.17411-.0234-.42857-.0703-.25447-.0469-.42188-.12388-.16741-.077-.38839-.19085-.22098-.11384-.39509-.26786-.17411-.15401-.3683-.35825-.1942-.20425-.375-.46541.39509-.62276.91071-1.82812.14732.30134.24777.48549.10044.18415.2712.42522.17076.24107.34152.37835t.42188.23438q.25111.0971.54576.0971h1.71428V7.85687q0-.0937.0603-.15402.0603-.0603.15402-.0603.0803 0 .16071.067l2.13616 2.13616q.0603.0603.0603.15402z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M12.999969 4.00002q0 .0937-.0603.15401l-2.14285 2.14286q-.0603.0603-.15402.0603-.0871 0-.15067-.0636-.0636-.0636-.0636-.15067V4.85721h-1.71428q-.32143 0-.58259.10045-.26116.10044-.46206.30134-.20089.20089-.34152.41183-.14062.21093-.30133.51897-.21429.41518-.52233 1.14509-.19419.44196-.33147.7433-.13728.30134-.36161.70313-.22433.40178-.42857.66964t-.49553.5558q-.2913.28795-.60268.45871-.31139.17076-.71317.28125-.40179.11049-.85714.11049H1.214245q-.09375 0-.154018-.0603-.060258-.0603-.060258-.15404V9.35716q0-.0937.06027-.15402.06027-.0603.154018-.0603h1.500004q.32142 0 .58258-.10044.26117-.10045.46206-.30134t.34152-.41183q.14062-.21094.30134-.51898.21428-.41517.52232-1.14508.19419-.44197.33147-.74331.13728-.30134.36161-.70312.22433-.40179.42857-.66965.20424-.26785.49553-.5558.2913-.28795.60268-.45871.31139-.17075.71317-.28124.40179-.1105.85715-.1105h1.71428V1.85713q0-.0937.0603-.15402.0603-.0603.15402-.0603.0803 0 .16071.067l2.13616 2.13616q.0603.0603.0603.15402z"
-                />
-              </svg>
-            )}
-          </button>
-          <p className={styles.randomMeta}>
-            {availablePublicIds.length
-              ? `${availablePublicIds.length} public IDs still open`
-              : "All public IDs have been collected"}
-          </p>
-        </div>
-
         <button
           type="button"
-          className={styles.mintButton}
-          onClick={submitMint}
+          className={styles.collectButton}
+          onClick={() => submitMint("next")}
           disabled={isMinting || !TOOL_CONTRACT_ADDRESS || !isConnected}
         >
-          {isSwitchingChain
-            ? "Switching network..."
-            : collectionSession.phase === "preparing" || isConfirming
-              ? "Confirming..."
-            : isWriting
-                ? "Submitting..."
-                : mintButtonLabel}
+          {collectButtonLabel}
         </button>
+
+        <div className={styles.claimPanel}>
+          <div className={styles.claimHeader}>
+            <span className={styles.claimTitle}>Prefer a number?</span>
+            <span className={styles.claimHint}>Choose a public ID instead.</span>
+          </div>
+
+          <div className={styles.claimControls}>
+            <label className={styles.claimField}>
+              <span>Public token ID</span>
+              <input
+                type="number"
+                min="1"
+                max={publicSupply ? publicSupply.toString() : "777"}
+                value={tokenId}
+                onChange={(event) => setTokenId(event.target.value)}
+              />
+            </label>
+
+            <button
+              type="button"
+              className={styles.claimButton}
+              onClick={() => submitMint("claim")}
+              disabled={isMinting || !TOOL_CONTRACT_ADDRESS || !isConnected}
+            >
+              {claimButtonLabel}
+            </button>
+          </div>
+
+          <div className={styles.randomRow}>
+            <button
+              type="button"
+              className={styles.randomButton}
+              onClick={chooseRandomOpenId}
+              disabled={isAvailabilityLoading || !availablePublicIds.length}
+              aria-label="Pick random available ID"
+            >
+              {isAvailabilityLoading ? "Checking..." : "Pick random available ID"}
+            </button>
+            <p className={styles.randomMeta}>
+              {availablePublicIds.length
+                ? `${availablePublicIds.length} public IDs still open`
+                : "All public IDs have been collected"}
+            </p>
+          </div>
+        </div>
 
         {collectionSession.phase === "preparing" ? (
           <div className={styles.feedbackCard}>

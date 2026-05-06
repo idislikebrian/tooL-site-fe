@@ -78,11 +78,10 @@
   cursor: pointer;
 }
 
-.mintButton,
-.modeButton,
-.modeActive {
+.collectButton,
+.claimButton,
+.randomButton {
   border: 1px solid var(--foreground);
-  background: var(--yellow);
   color: var(--foreground);
   min-height: 50px;
   padding: 0 16px;
@@ -90,23 +89,59 @@
   cursor: pointer;
 }
 
-.mintButton {
-  width: fit-content;
+.collectButton {
+  width: 100%;
   background: var(--foreground);
   color: #fffef6;
+  min-height: 64px;
+  font-size: 1.15rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.modeRow {
+.claimPanel {
   width: 100%;
-  display: grid;
-  grid-template-columns: 160px 160px minmax(220px, 1fr);
-  align-items: stretch;
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid rgba(17, 17, 17, 0.2);
+  background: rgba(255, 255, 255, 0.64);
 }
 
-.modeActive {
-  background: var(--red);
-  color: #fffef6;
+.claimHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.claimTitle {
+  font-size: 0.94rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.claimHint {
+  font-size: 0.9rem;
+  color: rgba(17, 17, 17, 0.68);
+}
+
+.claimControls {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(220px, auto);
+  align-items: end;
+  gap: 12px;
+}
+
+.claimButton {
+  background: var(--yellow);
+}
+
+.collectButton:disabled,
+.claimButton:disabled,
+.randomButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
 }
 
 .connectShell {
@@ -345,10 +380,6 @@
   justify-content: end;
 }
 
-.claimFieldHidden {
-  visibility: hidden;
-}
-
 .claimField span {
   font-size: 0.8rem;
   text-transform: uppercase;
@@ -363,11 +394,6 @@
   font: inherit;
 }
 
-.modeButton,
-.modeActive {
-  align-self: end;
-}
-
 .randomRow {
   width: 100%;
   display: flex;
@@ -377,48 +403,11 @@
 }
 
 .randomButton {
-  position: relative;
-  border: 1px solid var(--foreground);
   background: var(--background);
-  color: var(--foreground);
   min-height: 44px;
-  min-width: 44px;
-  padding: 0;
-  font: inherit;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.randomButton::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  left: calc(100% + 10px);
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 6px 8px;
-  border: 1px solid var(--foreground);
-  background: var(--yellow);
-  color: var(--foreground);
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
+  font-size: 0.86rem;
   text-transform: uppercase;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.16s ease;
-}
-
-.randomButton:hover::after,
-.randomButton:focus-visible::after {
-  opacity: 1;
-}
-
-.randomIcon {
-  width: 18px;
-  height: 18px;
-  display: block;
+  letter-spacing: 0.08em;
 }
 
 .randomMeta {
@@ -496,9 +485,9 @@
 
   .connectShell,
   .connectShell :global(button),
-  .mintButton,
+  .collectButton,
+  .claimButton,
   .claimField,
-  .modeRow,
   .randomButton {
     width: 100%;
   }
@@ -507,23 +496,13 @@
     align-items: stretch;
   }
 
-  .modeRow {
+  .claimControls {
     grid-template-columns: 1fr;
-  }
-
-  .claimFieldHidden {
-    display: none;
   }
 
   .walletNote {
     white-space: normal;
     overflow-wrap: anywhere;
-  }
-
-  .randomButton::after {
-    left: 0;
-    top: calc(100% + 10px);
-    transform: none;
   }
 
   .assemblySlip {
