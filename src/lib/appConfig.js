@@ -1,9 +1,9 @@
 export const APP_NAME = "tooL";
-export const APP_DESCRIPTION = "tooL is a collection of 888 onchain toolkits.";
+export const APP_DESCRIPTION = "A tool-based onchain identity experiment.";
 export const APP_BUTTON_TITLE = "Open tooL";
-export const APP_SPLASH_BACKGROUND_COLOR = "#fffff8";
+export const APP_SPLASH_BACKGROUND_COLOR = "#f7f4e8";
 
-const DEFAULT_APP_URL = "https://tool-site-fe.vercel.app";
+const DEFAULT_APP_URL = "https://www.boxes.tools";
 
 export function normalizeAppUrl(url = process.env.NEXT_PUBLIC_APP_URL) {
   return (url || DEFAULT_APP_URL).replace(/\/+$/, "");
