@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactCompiler: true,
+  transpilePackages: [
+    "@farcaster/miniapp-core",
+    "@farcaster/miniapp-sdk",
+    "@farcaster/miniapp-wagmi-connector",
+  ],
 
   webpack: (config) => {
     config.resolve.alias = {

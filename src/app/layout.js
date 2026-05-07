@@ -1,9 +1,21 @@
 import "./globals.css";
 import Providers from "@/components/Providers";
+import {
+  APP_DESCRIPTION,
+  APP_NAME,
+  MINIAPP_EMBED,
+  MINIAPP_ICON_URL,
+} from "@/lib/appConfig";
 
 export const metadata = {
-  title: "tooL",
-  description: "tooL is a collection of 888 onchain toolkits.",
+  title: APP_NAME,
+  description: APP_DESCRIPTION,
+  icons: {
+    icon: MINIAPP_ICON_URL,
+  },
+  other: {
+    "fc:miniapp": JSON.stringify(MINIAPP_EMBED),
+  },
 };
 
 export default function RootLayout({ children }) {

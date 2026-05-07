@@ -1,0 +1,18 @@
+{
+  "accountAssociation": {
+    "header": "REPLACE_WITH_FARCASTER_DEVELOPER_TOOLS_OUTPUT",
+    "payload": "REPLACE_WITH_FARCASTER_DEVELOPER_TOOLS_OUTPUT",
+    "signature": "REPLACE_WITH_FARCASTER_DEVELOPER_TOOLS_OUTPUT"
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "tooL",
+    "iconUrl": "https://YOUR_DOMAIN/miniapp-icon.png",
+    "homeUrl": "https://YOUR_DOMAIN",
+    "imageUrl": "https://YOUR_DOMAIN/miniapp-embed.png",
+    "buttonTitle": "Open tooL",
+    "splashImageUrl": "https://YOUR_DOMAIN/miniapp-icon.png",
+    "splashBackgroundColor": "#fffff8",
+    "description": "tooL is a collection of 888 onchain toolkits."
+  }
+}
