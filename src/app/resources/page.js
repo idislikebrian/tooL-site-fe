@@ -2,6 +2,9 @@ import styles from "./page.module.css";
 
 import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
+import { SITE_METADATA_BY_ROUTE } from "@/lib/appConfig";
+
+export const metadata = SITE_METADATA_BY_ROUTE.resources;
 
 export default function ResourcesPage() {
   return (

@@ -3,11 +3,9 @@ import styles from "./page.module.css";
 import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
 import { getContractToolboxes } from "@/lib/alchemy";
+import { SITE_METADATA_BY_ROUTE } from "@/lib/appConfig";
 
-export const metadata = {
-  title: "Gallery | tooL",
-  description: "A gallery of minted tooL boxes on Ethereum mainnet.",
-};
+export const metadata = SITE_METADATA_BY_ROUTE.gallery;
 
 export default async function GalleryPage() {
   let toolboxes = [];

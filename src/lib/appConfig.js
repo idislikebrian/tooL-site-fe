@@ -15,6 +15,34 @@ export const MINIAPP_EMBED_PATH = "/miniapp-embed.png";
 export const MINIAPP_ICON_URL = `${APP_URL}${MINIAPP_ICON_PATH}`;
 export const MINIAPP_EMBED_URL = `${APP_URL}${MINIAPP_EMBED_PATH}`;
 
+export const SITE_NAME = "tooL";
+export const SITE_TITLE = "tooL | Onchain toolkits for builders";
+export const SITE_DESCRIPTION =
+  "A collection of 888 fully onchain toolkits. No stats, no instructions, no intended outcome. Just tools.";
+export const SITE_OG_IMAGE_PATH = "/opengraph-image.png";
+export const SITE_OG_IMAGE_URL = `${APP_URL}${SITE_OG_IMAGE_PATH}`;
+
+export const SITE_METADATA_BY_ROUTE = {
+  home: {
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  gallery: {
+    title: "Gallery | tooL",
+    description: "Browse minted tooL boxes on Ethereum mainnet.",
+  },
+  faq: {
+    title: "FAQ | tooL",
+    description:
+      "Answers about tooL, onchain metadata, collecting, supply, and how the project works.",
+  },
+  resources: {
+    title: "Resources | tooL",
+    description:
+      "References, links, and downstream material for building with tooL.",
+  },
+};
+
 export const MINIAPP_EMBED = {
   version: "1",
   imageUrl: MINIAPP_EMBED_URL,

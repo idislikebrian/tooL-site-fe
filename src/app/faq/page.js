@@ -2,6 +2,9 @@ import styles from "./page.module.css";
 
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import { SITE_METADATA_BY_ROUTE } from "@/lib/appConfig";
+
+export const metadata = SITE_METADATA_BY_ROUTE.faq;
 
 export default function FAQPage() {
   return (
