@@ -17,6 +17,7 @@ import {
 } from "wagmi";
 
 import styles from "./MintCard.module.css";
+import { APP_URL } from "@/lib/appConfig";
 import {
   TOOL_ABI,
   TOOL_CHAIN,
@@ -142,6 +143,65 @@ function parseDataUriJson(dataUri) {
   }
 }
 
+function truncateText(value, maxLength) {
+  if (!value || value.length <= maxLength) {
+    return value || "";
+  }
+
+  return `${value.slice(0, Math.max(0, maxLength - 1)).trim()}...`;
+}
+
+function getMetadataAttribute(metadata, names) {
+  const attributes = Array.isArray(metadata?.attributes)
+    ? metadata.attributes
+    : [];
+  const normalizedNames = names.map((name) => name.toLowerCase());
+
+  return attributes.find((attribute) => {
+    const traitType = String(attribute?.trait_type || "").toLowerCase();
+    return normalizedNames.some((name) => traitType.includes(name));
+  })?.value;
+}
+
+function getMetadataLoadout(metadata) {
+  const attributes = Array.isArray(metadata?.attributes)
+    ? metadata.attributes
+    : [];
+  const excludedTraits = ["context", "title", "bonus", "marker"];
+
+  return attributes
+    .filter((attribute) => {
+      const traitType = String(attribute?.trait_type || "").toLowerCase();
+      return !excludedTraits.some((excluded) => traitType.includes(excluded));
+    })
+    .map((attribute) => attribute?.value)
+    .filter(Boolean)
+    .map(String)
+    .slice(0, 6);
+}
+
+function buildCollectorCast({ tokenId, metadata }) {
+  const paddedTokenId = String(tokenId).padStart(3, "0");
+  const name = metadata?.name || `tooLbox #${paddedTokenId}`;
+  const context =
+    getMetadataAttribute(metadata, ["context"]) ||
+    metadata?.description ||
+    "onchain tools, waiting to be used";
+  const loadout = getMetadataLoadout(metadata).join(" / ");
+  const lines = [
+    `I assembled tooLbox #${paddedTokenId}: ${truncateText(name, 64)}`,
+    `Context: ${truncateText(String(context), 72)}`,
+  ];
+
+  if (loadout) {
+    lines.push(`Loadout: ${truncateText(loadout, 96)}`);
+  }
+
+  lines.push(APP_URL);
+
+  return lines.join("\n");
+}
+
 async function readTokenMetadata(tokenId) {
   if (!TOOL_CONTRACT_ADDRESS || !tokenId) {
     return null;
@@ -200,6 +260,9 @@ export default function MintCard() {
   const [mintedTokenMetadata, setMintedTokenMetadata] = useState(null);
   const [mintedTokenMetadataStatus, setMintedTokenMetadataStatus] =
     useState("idle");
+  const [canComposeCast, setCanComposeCast] = useState(false);
+  const [isComposingCast, setIsComposingCast] = useState(false);
+  const [castError, setCastError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -242,6 +305,44 @@ export default function MintCard() {
     return () => {
       cancelled = true;
       window.clearInterval(intervalId);
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function detectComposeCast() {
+      if (typeof window === "undefined") {
+        return;
+      }
+
+      if (!window.ReactNativeWebView && window === window.parent) {
+        return;
+      }
+
+      try {
+        const { sdk } = await import("@farcaster/miniapp-sdk");
+        const isInMiniApp =
+          typeof sdk.isInMiniApp === "function"
+            ? await sdk.isInMiniApp(1000)
+            : true;
+
+        if (!cancelled) {
+          setCanComposeCast(
+            Boolean(isInMiniApp && typeof sdk.actions?.composeCast === "function"),
+          );
+        }
+      } catch {
+        if (!cancelled) {
+          setCanComposeCast(false);
+        }
+      }
+    }
+
+    detectComposeCast();
+
+    return () => {
+      cancelled = true;
     };
   }, []);
 
@@ -468,6 +569,7 @@ export default function MintCard() {
     }
 
     setLocalError("");
+    setCastError("");
     setConfirmedHash(undefined);
     setPendingHash(undefined);
     setReceipt(null);
@@ -574,6 +676,30 @@ export default function MintCard() {
 
     const randomIndex = Math.floor(Math.random() * availablePublicIds.length);
     setTokenId(String(availablePublicIds[randomIndex]));
+  }
+
+  async function shareCollectedToolbox() {
+    if (!displayedCollectedTokenId) {
+      return;
+    }
+
+    setIsComposingCast(true);
+    setCastError("");
+
+    try {
+      const { sdk } = await import("@farcaster/miniapp-sdk");
+      await sdk.actions.composeCast({
+        text: buildCollectorCast({
+          tokenId: displayedCollectedTokenId,
+          metadata: mintedTokenMetadata,
+        }),
+        embeds: [APP_URL],
+      });
+    } catch (error) {
+      setCastError(error?.message || "Unable to open the Farcaster composer.");
+    } finally {
+      setIsComposingCast(false);
+    }
   }
 
   const activeMintMode =
@@ -858,6 +984,21 @@ export default function MintCard() {
                 </a>
               ) : null}
             </div>
+            {canComposeCast ? (
+              <div className={styles.sharePanel}>
+                <button
+                  type="button"
+                  className={styles.castButton}
+                  onClick={shareCollectedToolbox}
+                  disabled={isComposingCast || !displayedCollectedTokenId}
+                >
+                  {isComposingCast ? "Opening composer..." : "Cast this toolbox"}
+                </button>
+                {castError ? (
+                  <p className={styles.castError}>{castError}</p>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         ) : null}
         {effectiveError ? (

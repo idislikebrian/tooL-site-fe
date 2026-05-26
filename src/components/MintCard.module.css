@@ -410,6 +410,35 @@
   letter-spacing: 0.08em;
 }
 
+.sharePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.castButton {
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--foreground);
+  background: var(--foreground);
+  color: #fffef6;
+  font: inherit;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.castButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.castError {
+  font-size: 0.9rem;
+  color: #b01919;
+}
+
 .randomMeta {
   font-size: 0.9rem;
   color: rgba(17, 17, 17, 0.72);
@@ -487,6 +516,7 @@
   .connectShell :global(button),
   .collectButton,
   .claimButton,
+  .castButton,
   .claimField,
   .randomButton {
     width: 100%;
@@ -514,6 +544,7 @@
   .slipGrid,
   .progressMeta,
   .joiningRow,
+  .sharePanel,
   .randomRow {
     grid-template-columns: 1fr;
     flex-direction: column;
